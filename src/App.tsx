@@ -8,6 +8,7 @@ import './App.css'
 import PromptListing from './pages/PromptListing';
 import PromptManagement from './pages/PromptManagement';
 import PromptPlayground from './pages/PromptPlayground';
+import PromptCreator from './pages/PromptCreator';
 
 function App() {
 
@@ -53,6 +54,7 @@ function App() {
 					></PromptListing>} />
 					<Route path="/manage" element={<PromptManagement></PromptManagement>} />
 					<Route path="/playground" element={<PromptPlayground></PromptPlayground>} />
+					<Route path="/create" element={<PromptCreator></PromptCreator>} />
 				</Routes>
 			</div>
 		</Router>
