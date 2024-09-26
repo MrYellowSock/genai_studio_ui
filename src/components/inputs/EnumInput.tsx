@@ -5,19 +5,23 @@ interface EnumInputProp {
 	placeholder: string
 	value: string[]
 	onChange: (enums: string[]) => void
+	disabled?: boolean
 }
-export default function EnumInput({ value, onChange, title, placeholder }: EnumInputProp) {
+export default function EnumInput({ value, onChange, title, placeholder, disabled }: EnumInputProp) {
 	const handleEnumChange = (index: number, key: string) => {
+		if (disabled) return;
 		const newEnumValues = [...value];
 		newEnumValues[index] = key;
 		onChange(newEnumValues);
 	};
 
 	const addEnumValue = () => {
+		if (disabled) return;
 		onChange([...value, ""]);
 	};
 
 	const removeEnumValue = (index: number) => {
+		if (disabled) return;
 		const newEnumValues = value.filter((_, i) => i !== index);
 		onChange(newEnumValues);
 	};
@@ -32,6 +36,7 @@ export default function EnumInput({ value, onChange, title, placeholder }: EnumI
 							value={value}
 							onChange={(e) => handleEnumChange(index, e.target.value)}
 							placeholder={`${placeholder} ${index + 1}`}
+							disabled={disabled}
 						/>
 					</Col>
 					<Col xs="auto">

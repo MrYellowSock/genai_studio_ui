@@ -1,4 +1,4 @@
-import { Button, Col, Form, Row } from "react-bootstrap";
+import { Col, Form, Row } from "react-bootstrap";
 import { useState } from 'react';
 import EnumInput from "./inputs/EnumInput";
 import JsonInput from "./inputs/JsonInput";
@@ -21,16 +21,27 @@ interface GenaiOption {
 
 interface PromptConfigEditorProp {
 	// creator will have extra checkbox to fix each field
-	variant: 'playground' | 'creator'
-	// for show in management
-	readonly?: boolean
+	variant?: 'playground' | 'creator' | 'viewer'
 	genai_models: GenaiOption[]
+	value: any
+	onChange: (newValue: any) => void
+
+	creatorFieldFixedState?: Record<string, boolean>
+	onCreatorFieldFixedChange?: (fixedState: Record<string, boolean>) => void
 }
 
-export default function PromptConfigEditor({ genai_models }: PromptConfigEditorProp) {
-	const [config, setconfig] = useState<any>({})
-
+export default function PromptConfigEditor({ variant, genai_models, value: config, onChange: setconfig, creatorFieldFixedState, onCreatorFieldFixedChange }: PromptConfigEditorProp) {
+	const readOnly = variant === 'viewer'
+	const isCreator = variant === 'creator'
+	const handleCreatorFieldFixed = (key: string, fixed: boolean) => {
+		onCreatorFieldFixedChange?.({
+			...creatorFieldFixedState,
+			[key]: fixed
+		})
+	}
 	const handleFieldEdit = (key: string, value: any) => {
+		if (readOnly)
+			return
 		if (key == "genai_model")
 			setconfig({
 				[key]: value
@@ -42,14 +53,21 @@ export default function PromptConfigEditor({ genai_models }: PromptConfigEditorP
 			})
 	}
 
+	const handleResponseFormatChange = (format: string) => {
+		setResponseFormat(format)
+		let { response_enum, response_json, ...rest } = config
+		setconfig(rest)
+	}
+
 	const fields = {
 		"seed": (
 			<Form.Group className="mb-3">
 				<Form.Label>Seed</Form.Label>
 				<Form.Control
-					onChange={e => handleFieldEdit("seed", e.target.value)}
+					onChange={e => handleFieldEdit("seed", +e.target.value)}
 					value={config["seed"] || ''}
 					type="number"
+					disabled={readOnly}
 				/>
 			</Form.Group>
 		),
@@ -57,10 +75,11 @@ export default function PromptConfigEditor({ genai_models }: PromptConfigEditorP
 			<Form.Group className="mb-3">
 				<Form.Label>Frequency Penalty</Form.Label>
 				<Form.Control
-					onChange={e => handleFieldEdit("frequency_penalty", e.target.value)}
+					onChange={e => handleFieldEdit("frequency_penalty", +e.target.value)}
 					value={config["frequency_penalty"] || ''}
 					type="number"
 					step={0.01}
+					disabled={readOnly}
 				/>
 			</Form.Group>
 		),
@@ -70,6 +89,7 @@ export default function PromptConfigEditor({ genai_models }: PromptConfigEditorP
 				onChange={value => handleFieldEdit("presence_penalty", value)}
 				title={"Presence Penalty"}
 				placeholder="keyword"
+				disabled={readOnly}
 			/>
 		),
 		"candidate_count": (
@@ -77,8 +97,9 @@ export default function PromptConfigEditor({ genai_models }: PromptConfigEditorP
 				<Form.Label>Candidate Count</Form.Label>
 				<Form.Control
 					value={config["candidate_count"] || ''}
-					onChange={(e) => handleFieldEdit("candidate_count", e.target.value)}
+					onChange={(e) => handleFieldEdit("candidate_count", +e.target.value)}
 					type="number"
+					disabled={readOnly}
 				/>
 			</Form.Group>
 		),
@@ -88,6 +109,7 @@ export default function PromptConfigEditor({ genai_models }: PromptConfigEditorP
 				onChange={value => handleFieldEdit("stop_sequences", value)}
 				title={"Stop Sequences"}
 				placeholder="keyword"
+				disabled={readOnly}
 			/>
 		),
 		"max_output_tokens": (
@@ -97,7 +119,8 @@ export default function PromptConfigEditor({ genai_models }: PromptConfigEditorP
 					type="number"
 					step={1}
 					value={config["max_output_tokens"] || ''}
-					onChange={(e) => handleFieldEdit("max_output_tokens", e.target.value)}
+					onChange={(e) => handleFieldEdit("max_output_tokens", +e.target.value)}
+					disabled={readOnly}
 				/>
 			</Form.Group>
 		),
@@ -110,7 +133,8 @@ export default function PromptConfigEditor({ genai_models }: PromptConfigEditorP
 					max={1}
 					step={0.01}
 					value={config["temperature"] || ''}
-					onChange={(e) => handleFieldEdit("temperature", e.target.value)}
+					onChange={(e) => handleFieldEdit("temperature", +e.target.value)}
+					disabled={readOnly}
 				/>
 			</Form.Group>
 		),
@@ -121,7 +145,8 @@ export default function PromptConfigEditor({ genai_models }: PromptConfigEditorP
 					type="number"
 					step={0.01}
 					value={config["top_p"] || ''}
-					onChange={(e) => handleFieldEdit("top_p", e.target.value)}
+					onChange={(e) => handleFieldEdit("top_p", +e.target.value)}
+					disabled={readOnly}
 				/>
 			</Form.Group>
 		),
@@ -132,7 +157,8 @@ export default function PromptConfigEditor({ genai_models }: PromptConfigEditorP
 					type="number"
 					step={1}
 					value={config["top_k"] || ''}
-					onChange={(e) => handleFieldEdit("top_k", e.target.value)}
+					onChange={(e) => handleFieldEdit("top_k", +e.target.value)}
+					disabled={readOnly}
 				/>
 			</Form.Group>
 		),
@@ -150,7 +176,7 @@ export default function PromptConfigEditor({ genai_models }: PromptConfigEditorP
 		<Form>
 			<Form.Group className="mb-3" >
 				<Form.Label>Model</Form.Label>
-				<Form.Select value={config.genai_model} onChange={(e) => {
+				<Form.Select disabled={readOnly} value={config.genai_model} onChange={(e) => {
 					handleFieldEdit("genai_model", e.target.value)
 					setResponseFormat("text")
 					// TODO : clear every config
@@ -160,10 +186,8 @@ export default function PromptConfigEditor({ genai_models }: PromptConfigEditorP
 			</Form.Group>
 			<Form.Group className="mb-3" >
 				<Form.Label>Response format</Form.Label>
-				<Form.Select value={responseFormat} onChange={event => {
-					setResponseFormat(event.target.value)
-					let { response_enum, response_json, ...rest } = config
-					setconfig(rest)
+				<Form.Select disabled={readOnly} value={responseFormat} onChange={event => {
+					handleResponseFormatChange(event.target.value)
 				}}>
 					{supportedFormats.map(format => <option value={format}>{format}</option>)}
 				</Form.Select>
@@ -176,16 +200,29 @@ export default function PromptConfigEditor({ genai_models }: PromptConfigEditorP
 					onChange={enum2 => handleFieldEdit("response_enum", enum2)}
 					title="Enum values"
 					placeholder="Enum value"
+					disabled={readOnly}
 				/>
 			}
 			{
 				responseFormat === "json" && <JsonInput />
 			}
-
 			{
 				Object.entries(fields).map(([name, element]) => {
 					if (!currentModel?.supported_config_fields.includes(name as any))
 						return <></>
+					if (isCreator)
+						return <Row className="align-items-center">
+							<Col>
+								{element}
+							</Col>
+							<Col xs="auto" className="text-center">
+								<Form.Label>fixed</Form.Label>
+								<Form.Check
+									checked={creatorFieldFixedState?.[name] ?? true}
+									onChange={e => handleCreatorFieldFixed(name, e.target.checked)}
+								></Form.Check>
+							</Col>
+						</Row>
 					return element
 				})
 			}

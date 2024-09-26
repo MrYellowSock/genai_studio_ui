@@ -3,17 +3,25 @@ import EnvBadge from "../components/EnvBadge";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { fetchDeployments } from "../utils/api";
+import ErrorToast from "../components/ErrorToast";
 
 export default function PromptManagement() {
 	const { id } = useParams(); // Extract the id from the URL parameters
 	const [deployments, setdeployments] = useState<any[] | undefined>(undefined)
+	const [error, setError] = useState<string | null>(null); // State for handling errors
 	useEffect(() => {
 		if (id)
-			fetchDeployments(id).then(setdeployments)
+			fetchDeployments(id)
+				.then(setdeployments)
+				.catch(err => setError(err.message))
 	}, [id])
 	return (
 		<Container>
-			<Row></Row>
+			<Row>
+				{error &&
+					<ErrorToast error={error}></ErrorToast>
+				}
+			</Row>
 			<Row>
 				<h4>deployments</h4>
 				<Table>

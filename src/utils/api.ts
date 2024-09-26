@@ -50,6 +50,54 @@ export function fetchModels(name: string) {
 		])
 }
 
+export function fetchLLMs() {
+	return fetchMock([
+		{
+			name: "jimmy",
+			supported_config_fields: [
+				"top_p",
+			]
+		},
+		{
+			name: "jimmy2",
+			supported_config_fields: [
+				"response_enum"
+			]
+		},
+		{
+			name: "jimmy3",
+			supported_config_fields: [
+				"response_json"
+			]
+		},
+		{
+			name: "jimmy5",
+			supported_config_fields: [
+				"response_json",
+				"response_enum"
+			]
+		},
+		{
+			name: "super",
+			supported_config_fields: [
+				"seed",
+				"frequency_penalty",
+				"presence_penalty",
+				"candidate_count",
+				"stop_sequences",
+				"max_output_tokens",
+				"temperature",
+				"top_p",
+				"top_k",
+				"response_json",
+				"response_enum"
+
+			]
+		}
+
+	])
+}
+
 export function fetchDeployments(model_id: string) {
 	return fetchMock([
 		{
