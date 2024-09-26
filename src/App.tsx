@@ -5,10 +5,10 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css'
-import PromptListing from './pages/PromptListing';
 import PromptManagement from './pages/PromptManagement';
 import PromptPlayground from './pages/PromptPlayground';
 import PromptCreator from './pages/PromptCreator';
+import Home from './pages/Home';
 
 function App() {
 
@@ -35,23 +35,7 @@ function App() {
 
 				{/* Route Components */}
 				<Routes>
-					<Route path="/" element={<PromptListing
-						model_names={["abc", "def"]}
-						models={[
-							{
-								name: "abc",
-								version: "1",
-								id: "1",
-								deploy_envs: ["beta", "pro"]
-							},
-							{
-								name: "abc",
-								version: "2",
-								id: "1",
-								deploy_envs: []
-							}
-						]}
-					></PromptListing>} />
+					<Route path="/" element={<Home ></Home>} />
 					<Route path="/manage" element={<PromptManagement></PromptManagement>} />
 					<Route path="/playground" element={<PromptPlayground></PromptPlayground>} />
 					<Route path="/create" element={<PromptCreator></PromptCreator>} />

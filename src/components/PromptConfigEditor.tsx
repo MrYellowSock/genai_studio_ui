@@ -31,10 +31,15 @@ export default function PromptConfigEditor({ genai_models }: PromptConfigEditorP
 	const [config, setconfig] = useState<any>({})
 
 	const handleFieldEdit = (key: string, value: any) => {
-		setconfig({
-			...config,
-			[key]: value
-		})
+		if (key == "genai_model")
+			setconfig({
+				[key]: value
+			})
+		else
+			setconfig({
+				...config,
+				[key]: value
+			})
 	}
 
 	const fields = {
@@ -155,10 +160,11 @@ export default function PromptConfigEditor({ genai_models }: PromptConfigEditorP
 			</Form.Group>
 			<Form.Group className="mb-3" >
 				<Form.Label>Response format</Form.Label>
-				{
-					// TODO : clear all format
-				}
-				<Form.Select value={responseFormat} onChange={event => setResponseFormat(event.target.value)}>
+				<Form.Select value={responseFormat} onChange={event => {
+					setResponseFormat(event.target.value)
+					let { response_enum, response_json, ...rest } = config
+					setconfig(rest)
+				}}>
 					{supportedFormats.map(format => <option value={format}>{format}</option>)}
 				</Form.Select>
 			</Form.Group>
@@ -178,7 +184,7 @@ export default function PromptConfigEditor({ genai_models }: PromptConfigEditorP
 
 			{
 				Object.entries(fields).map(([name, element]) => {
-					if (!currentModel?.supported_config_fields.includes(name))
+					if (!currentModel?.supported_config_fields.includes(name as any))
 						return <></>
 					return element
 				})
