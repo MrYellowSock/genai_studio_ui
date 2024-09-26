@@ -23,7 +23,7 @@ export function fetchModelNames() {
 	return fetchMock(["abc", "def"])
 }
 
-export function fetchModelMetas(name: string) {
+export function fetchModels(name: string) {
 	if (name == 'abc')
 		return fetchMock([
 			{
@@ -35,7 +35,7 @@ export function fetchModelMetas(name: string) {
 			{
 				name: "abc",
 				version: "2",
-				id: "1",
+				id: "2",
 				deploy_envs: []
 			}
 		])
@@ -48,4 +48,26 @@ export function fetchModelMetas(name: string) {
 				deploy_envs: ["beta", "pro"]
 			}
 		])
+}
+
+export function fetchDeployments(model_id: string) {
+	return fetchMock([
+		{
+			"deploy_env": "beta",
+			"deploy_name": "def",
+			"deploy_version": "2",
+
+			"id": 1,
+			"model_id": model_id,
+		},
+		{
+			"deploy_env": "pro",
+			"deploy_name": "def",
+			"deploy_version": "2",
+
+			"id": 2,
+			"model_id": model_id,
+		}
+	])
+
 }

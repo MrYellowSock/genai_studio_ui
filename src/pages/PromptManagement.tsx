@@ -1,7 +1,16 @@
-import { Button, Col, Container, Form, Row, Table } from "react-bootstrap";
+import { Button, Col, Container, Form, Row, Spinner, Table } from "react-bootstrap";
 import EnvBadge from "../components/EnvBadge";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { fetchDeployments } from "../utils/api";
 
 export default function PromptManagement() {
+	const { id } = useParams(); // Extract the id from the URL parameters
+	const [deployments, setdeployments] = useState<any[] | undefined>(undefined)
+	useEffect(() => {
+		if (id)
+			fetchDeployments(id).then(setdeployments)
+	}, [id])
 	return (
 		<Container>
 			<Row></Row>
@@ -10,19 +19,31 @@ export default function PromptManagement() {
 				<Table>
 					<thead>
 						<tr>
+							<th>name</th>
+							<th>version</th>
 							<th>env</th>
 							<th>action</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr >
-							<td>
-								<EnvBadge env="alpha"></EnvBadge>
-							</td>
-							<td>
-								<Button>Playground</Button>
-							</td>
-						</tr>
+						{deployments == null && <Spinner></Spinner>}
+						{deployments != null && deployments.map(d => {
+							return <tr >
+								<td>
+									{d.deploy_name}
+								</td>
+								<td>
+									{d.deploy_version}
+								</td>
+								<td>
+									<EnvBadge env={d.deploy_env}></EnvBadge>
+								</td>
+								<td>
+									<Button>Playground</Button>
+								</td>
+							</tr>
+						})}
+
 					</tbody>
 				</Table>
 			</Row>

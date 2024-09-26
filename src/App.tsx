@@ -36,7 +36,7 @@ function App() {
 				{/* Route Components */}
 				<Routes>
 					<Route path="/" element={<Home ></Home>} />
-					<Route path="/manage" element={<PromptManagement></PromptManagement>} />
+					<Route path="/manage/:id" element={<PromptManagement></PromptManagement>} />
 					<Route path="/playground" element={<PromptPlayground></PromptPlayground>} />
 					<Route path="/create" element={<PromptCreator></PromptCreator>} />
 				</Routes>
