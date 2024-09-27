@@ -20,7 +20,6 @@ export default function PromptCreator() {
 	return (
 		<Container fluid>
 			{error != null && <ErrorToast error={error}></ErrorToast>}
-			{llms == null && <Spinner></Spinner>}
 			{llms != null &&
 				<Row>
 					<PromptTemplateEditor
@@ -30,7 +29,7 @@ export default function PromptCreator() {
 						onTemplateChange={settemplate}
 					></PromptTemplateEditor>
 				</Row>
-			}
+				|| <Spinner></Spinner>}
 
 			<Row >
 				<Col></Col>

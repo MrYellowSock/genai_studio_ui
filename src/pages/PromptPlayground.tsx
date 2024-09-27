@@ -100,7 +100,6 @@ export default function PromptPlayground() {
 				</Col>
 				<Col>
 					{error != null && <ErrorToast error={error}></ErrorToast>}
-					{llms == null && <Spinner></Spinner>}
 					{llms != null && (
 						<PromptConfigEditor
 							variant="playground"
@@ -108,7 +107,7 @@ export default function PromptPlayground() {
 							value={config}
 							onChange={setconfig}
 						></PromptConfigEditor>
-					)}
+					) || <Spinner></Spinner>}
 				</Col>
 			</Row>
 		</Container>

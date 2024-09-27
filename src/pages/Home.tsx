@@ -33,7 +33,6 @@ export default function Home() {
 	}, [selectedModel]);
 
 	return <>
-		{names == null && <Spinner></Spinner>}
 		{names != null && <PromptListing
 			model_names={names}
 			models={models}
@@ -41,7 +40,7 @@ export default function Home() {
 			onManage={(id) => {
 				navigate(`/manage/${id}`); // Navigate to /manage and pass the id
 			}}
-		/>}
+		/> || <Spinner></Spinner>}
 
 
 		{error &&

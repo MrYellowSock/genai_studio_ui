@@ -34,12 +34,12 @@ export default function PromptManagement() {
 	return (
 		<Container>
 			<Row>
-				{llms != null && template != null &&
+				{(llms != null && template != null &&
 					<PromptTemplateEditor
 						varaint="viewer"
 						template={template}
 						llms={llms}
-					></PromptTemplateEditor>
+					></PromptTemplateEditor>) || <Spinner></Spinner>
 				}
 			</Row>
 			<Row>
@@ -59,7 +59,6 @@ export default function PromptManagement() {
 						</tr>
 					</thead>
 					<tbody>
-						{deployments == null && <Spinner></Spinner>}
 						{deployments != null && deployments.map(d => {
 							return <tr >
 								<td>
@@ -75,7 +74,7 @@ export default function PromptManagement() {
 									<Button>Playground</Button>
 								</td>
 							</tr>
-						})}
+						}) || <Spinner></Spinner>}
 
 					</tbody>
 				</Table>
