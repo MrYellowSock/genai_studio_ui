@@ -210,7 +210,7 @@ export default function PromptConfigEditor({ variant, genai_models, value: confi
 				Object.entries(fields).map(([name, element]) => {
 					if (!currentModel?.supported_config_fields.includes(name as any))
 						return <></>
-					if (isCreator)
+					if (isCreator || readOnly)
 						return <Row className="align-items-center">
 							<Col>
 								{element}

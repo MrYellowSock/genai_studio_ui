@@ -87,6 +87,15 @@ export default function PromptPlayground() {
 								<Button variant="primary" onClick={handleRun}>Run</Button>
 							</Col>
 						</Row>
+
+						<Row className='mt-3'>
+							<Form.Control
+								value={"Output"}
+								as="textarea"
+								rows={3}
+								readOnly={true}
+							/>
+						</Row>
 					</Form>
 				</Col>
 				<Col>

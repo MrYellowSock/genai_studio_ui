@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Spinner, Toast } from "react-bootstrap";
+import { Spinner } from "react-bootstrap";
 import PromptListing from "../components/PromptListing";
 import { fetchModels, fetchModelNames } from "../utils/api";
 import { useNavigate } from "react-router-dom";

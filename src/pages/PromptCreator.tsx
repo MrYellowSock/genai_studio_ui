@@ -1,31 +1,51 @@
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
-import PromptInputEditor from "../components/PromptInputEditor";
-import { useState } from "react";
+import { Button, Col, Container, Row, Spinner } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { fetchLLMs } from "../utils/api";
+import ErrorToast from "../components/ErrorToast";
+import RequiredInput from "../components/inputs/RequiredInput";
+import PromptTemplateEditor from "../components/PromptTemplateEditor";
 
 export default function PromptCreator() {
-	const [input, setInput] = useState<Record<string, any>>({
-		images: {
-			type: "files",
-			file_types: [".png", ".jpeg", ".tiff"],
-			required: false,
-			max_length: 4,
-			description: "sfaf",
-		},
-		file2: {
-			type: "file",
-			file_types: [".pdf"],
-			max_file_size: 2000000,
-		},
-		msg: {
-			type: "string",
-		},
-	});
+	const [error, setError] = useState<string | null>(null); // State for handling errors
+	const [llms, setllms] = useState<any[] | undefined>(undefined);
+	const [modelName, setmodelName] = useState<string>("")
+	const [modelVer, setmodelVer] = useState<string>("")
+	const [template, settemplate] = useState<any>(undefined)
+
+	useEffect(() => {
+		if (llms == null) {
+			fetchLLMs().then(setllms).catch(err => setError(err.message));
+		}
+	}, [llms]);
 	return (
-		<Container>
-			<PromptInputEditor
-				value={input}
-				onChange={setInput}
-			></PromptInputEditor>
+		<Container fluid>
+			{error != null && <ErrorToast error={error}></ErrorToast>}
+			{llms == null && <Spinner></Spinner>}
+			{llms != null &&
+				<Row>
+					<PromptTemplateEditor
+						varaint="creator"
+						llms={llms}
+						template={template}
+						onTemplateChange={settemplate}
+					></PromptTemplateEditor>
+				</Row>
+			}
+
+			<Row >
+				<Col></Col>
+				<Col xs="auto">
+					<RequiredInput name="Model name" value={modelName} onChange={setmodelName}>
+					</RequiredInput>
+				</Col>
+				<Col xs="auto">
+					<RequiredInput name="Model version" value={modelVer} onChange={setmodelVer}>
+					</RequiredInput>
+				</Col>
+				<Col xs="auto" >
+					<Button onClick={() => console.log("CREATE ME", template)}>Create</Button>
+				</Col>
+			</Row>
 		</Container>
 	);
 }

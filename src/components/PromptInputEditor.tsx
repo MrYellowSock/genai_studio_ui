@@ -1,4 +1,5 @@
 import { Button, Col, Form, Row } from "react-bootstrap";
+import RequiredInput from "./inputs/RequiredInput";
 
 interface PromtRegisEntryInput {
 	type: 'string' | 'file' | 'files'
@@ -11,10 +12,12 @@ interface PromtRegisEntryInput {
 }
 
 interface PromptInputEditorProp {
+	variant?: 'creator' | 'viewer'
 	value: Record<string, PromtRegisEntryInput>
 	onChange: (newValue: Record<string, PromtRegisEntryInput>) => void
 }
-export default function PromptInputEditor({ value: input, onChange: setInput }: PromptInputEditorProp) {
+export default function PromptInputEditor({ value: input, onChange: setInput, variant }: PromptInputEditorProp) {
+	const readOnly = variant === 'viewer'
 	const handleInputTypeChange = (name: string, value: string) => {
 		setInput({
 			...input,
@@ -25,6 +28,7 @@ export default function PromptInputEditor({ value: input, onChange: setInput }: 
 	}
 
 	const handleFieldChange = (name: string, field: string, value: any) => {
+		if (readOnly) return
 		if (field == "type")
 			handleInputTypeChange(name, value)
 		else
@@ -61,20 +65,14 @@ export default function PromptInputEditor({ value: input, onChange: setInput }: 
 				return (
 					<Row key={index} className="align-items-center">
 						<Col xs={2}>
-							<Form.Group className="mb-3">
-								<Form.Label>
-									Name <span style={{ color: "red" }}>*</span>
-								</Form.Label>
-								<Form.Control
-									value={name}
-									required
-									onChange={(e) => handleNameChange(name, e.target.value)}
-									isInvalid={!name}
-								/>
-								<Form.Control.Feedback type="invalid">
-									Name is required.
-								</Form.Control.Feedback>
-							</Form.Group>
+							<RequiredInput
+								name={"Name"}
+								value={name}
+								onChange={(e) => handleNameChange(name, e)}
+								readOnly={readOnly}
+							>
+
+							</RequiredInput>
 						</Col>
 						<Col xs={2}>
 							<Form.Group className="mb-3">
@@ -104,6 +102,7 @@ export default function PromptInputEditor({ value: input, onChange: setInput }: 
 													Number(e.target.value)
 												)
 											}
+											readOnly={readOnly}
 										/>
 									</Form.Group>
 								</Col>
@@ -119,6 +118,7 @@ export default function PromptInputEditor({ value: input, onChange: setInput }: 
 													e.target.value.split(" ")
 												)
 											}
+											readOnly={readOnly}
 										/>
 									</Form.Group>
 								</Col>
@@ -138,18 +138,21 @@ export default function PromptInputEditor({ value: input, onChange: setInput }: 
 												Number(e.target.value)
 											)
 										}
+										readOnly={readOnly}
 									/>
 								</Form.Group>
 							</Col>
 						)}
 						<Col></Col>
 						<Col xs="auto">
-							<Button
-								variant="danger"
-								onClick={() => handleRemoveField(name)}
-							>
-								-
-							</Button>
+							{!readOnly &&
+								<Button
+									variant="danger"
+									onClick={() => handleRemoveField(name)}
+								>
+									-
+								</Button>
+							}
 						</Col>
 					</Row>
 				);
@@ -157,7 +160,9 @@ export default function PromptInputEditor({ value: input, onChange: setInput }: 
 			<Row>
 				<Col></Col>
 				<Col xs={"auto"}>
-					<Button onClick={handleAddField}>+</Button>
+					{!readOnly &&
+						<Button onClick={handleAddField}>+</Button>
+					}
 				</Col>
 			</Row>
 		</Row>
