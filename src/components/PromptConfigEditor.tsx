@@ -179,8 +179,8 @@ export default function PromptConfigEditor({ variant, genai_models, value: confi
 				<Form.Select disabled={readOnly} value={config.genai_model} onChange={(e) => {
 					handleFieldEdit("genai_model", e.target.value)
 					setResponseFormat("text")
-					// TODO : clear every config
 				}}>
+					<option value="">Select a model</option>
 					{genai_models.map(m => <option value={m.name}>{m.name}</option>)}
 				</Form.Select>
 			</Form.Group>
@@ -193,7 +193,6 @@ export default function PromptConfigEditor({ variant, genai_models, value: confi
 				</Form.Select>
 			</Form.Group>
 
-			{/* Enum Input Section */}
 			{
 				responseFormat === "enum" && <EnumInput
 					value={config.response_enum ?? []}
@@ -204,7 +203,10 @@ export default function PromptConfigEditor({ variant, genai_models, value: confi
 				/>
 			}
 			{
-				responseFormat === "json" && <JsonInput />
+				responseFormat === "json" && <JsonInput
+					json={config.response_json ?? {}}
+					onChange={json => handleFieldEdit("response_json", json)}
+				/>
 			}
 			{
 				Object.entries(fields).map(([name, element]) => {
