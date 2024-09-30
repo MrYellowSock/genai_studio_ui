@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import PromptConfigEditor from '../components/PromptConfigEditor';
 import { useEffect, useState, useRef } from 'react';
-import { fetchLLMs } from '../utils/api';
+import { fetchDirectInfer, fetchLLMs } from '../utils/api';
 import ErrorToast from '../components/ErrorToast';
 
 export default function PromptPlayground() {
@@ -13,6 +13,10 @@ export default function PromptPlayground() {
 	const [systemMsg, setsystemMsg] = useState("")
 	const [promptMsg, setpromptMsg] = useState("")
 	const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null); // State for selected files
+	const [output, setoutput] = useState("")
+	const [inferenceTime, setinferenceTime] = useState("")
+	const [totalTime, settotalTime] = useState("")
+	const [loading, setloading] = useState(false)
 	const fileInputRef = useRef<HTMLInputElement>(null); // Ref for file input
 
 	useEffect(() => {
@@ -27,7 +31,22 @@ export default function PromptPlayground() {
 
 	const handleRun = () => {
 		// call infer api
-		console.log("Run with config", config, systemMsg, promptMsg, selectedFiles);
+		let input = {
+			systemMsg: systemMsg,
+			promptMsg: promptMsg,
+			config: config,
+			files: selectedFiles
+		}
+		console.log("Run with", input);
+		setoutput("")
+		setinferenceTime("")
+		settotalTime("")
+		setloading(true)
+		fetchDirectInfer(input).then((res) => {
+			setoutput(res.output);
+			setinferenceTime(res.genai_response_time_ms.toString())
+			settotalTime("9999")
+		}).catch(err => setError(err.message)).finally(() => setloading(false));
 	};
 
 	const handleAttachFiles = () => {
@@ -84,17 +103,22 @@ export default function PromptPlayground() {
 								)}
 							</Col>
 							<Col>
-								<Button variant="primary" onClick={handleRun}>Run</Button>
+								{!loading ?
+									<Button variant="primary" onClick={handleRun}>Run</Button> :
+									<Spinner></Spinner>
+								}
 							</Col>
 						</Row>
 
 						<Row className='mt-3'>
 							<Form.Control
-								value={"Output"}
+								value={output}
 								as="textarea"
 								rows={3}
 								readOnly={true}
 							/>
+							<span>Inference time took : {inferenceTime} ms</span>
+							<span>Total API time took : {totalTime} ms</span>
 						</Row>
 					</Form>
 				</Col>

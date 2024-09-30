@@ -224,3 +224,16 @@ export function fetchInfer() {
 export function fetchRegisPrompt(name: string, version: string, template: PromptRegisFull) {
 	return fetchMock({})
 }
+
+// playground , What if output was json.
+export function fetchDirectInfer(input: {
+	systemMsg: string,
+	promptMsg: string,
+	files: FileList | null,
+	config: any
+}) {
+	return fetchMock({
+		"genai_response_time_ms": 4191.522836685181,
+		"output": "Holy geez"
+	})
+}
