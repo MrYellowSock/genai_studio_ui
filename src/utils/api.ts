@@ -220,3 +220,7 @@ export function fetchDeployments(model_id: string) {
 export function fetchInfer() {
 
 }
+
+export function fetchRegisPrompt(name: string, version: string, template: PromptRegisFull) {
+	return fetchMock({})
+}
