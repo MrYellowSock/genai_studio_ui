@@ -1,10 +1,12 @@
 import { Button, Col, Container, Row, Spinner, Toast } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { fetchLLMs, fetchRegisPrompt } from "../utils/api";
+import { fetchLLMs, fetchModel, fetchRegisPrompt } from "../utils/api";
 import ErrorToast from "../components/ErrorToast";
 import RequiredInput from "../components/inputs/RequiredInput";
 import PromptTemplateEditor from "../components/PromptTemplateEditor";
+import { useLocation } from "react-router-dom";
 
+// DO NEXT : ?ref for forkModel
 export default function PromptCreator() {
 	const [error, setError] = useState<string | null>(null); // State for handling errors
 	const [success, setSuccess] = useState<boolean>(false);  // State for handling success message
@@ -14,11 +16,27 @@ export default function PromptCreator() {
 	const [template, settemplate] = useState<any>(undefined)
 	const [submitting, setsubmitting] = useState(false)
 
+	const location = useLocation();
+	const searchParams = new URLSearchParams(location.search);
+	const refTemplateId = searchParams.get('ref'); // Get the value of 'param'
+
 	useEffect(() => {
 		if (llms == null) {
-			fetchLLMs().then(setllms).catch(err => setError(err.message));
+			fetchLLMs()
+				.then(setllms)
+				.catch(err => setError(err.message));
 		}
 	}, [llms]);
+
+	useEffect(() => {
+		if (refTemplateId != null) {
+			fetchModel(refTemplateId)
+				.then((model) => {
+					settemplate(model);
+				})
+				.catch(err => setError(err.message));
+		}
+	}, [refTemplateId]);
 
 	const handleCreate = () => {
 		if (modelName.length === 0 || modelVer.length === 0 || template == null) {
