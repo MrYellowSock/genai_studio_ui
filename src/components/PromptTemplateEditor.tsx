@@ -4,6 +4,7 @@ import PromptInputEditor from "../components/PromptInputEditor";
 import { useEffect, useState } from "react";
 import PromptConfigEditor from "../components/PromptConfigEditor";
 import { PromptRegisFull } from "../utils/api";
+import TemplateStringInput from './inputs/TemplateStringInput';
 
 interface PromptTemplateEditorProp {
 	varaint?: 'creator' | 'viewer'
@@ -74,24 +75,18 @@ export default function PromptTemplateEditor({ template, varaint, llms, onTempla
 				<Col xs={12} xxl={4}>
 					<Form.Group className="mb-3">
 						<Form.Label>System instruction</Form.Label>
-						<Form.Control
-							value={systemMsg}
-							readOnly={varaint === 'viewer'}
-							onChange={e => setsystemMsg(e.target.value)}
-							as="textarea"
-							rows={3}
-							placeholder="Enter your text here" />
+						<TemplateStringInput
+							code={systemMsg}
+							onChange={setsystemMsg}
+						></TemplateStringInput>
 					</Form.Group>
 
 					<Form.Group className="mb-3">
 						<Form.Label>Prompt content</Form.Label>
-						<Form.Control
-							readOnly={varaint === 'viewer'}
-							value={promptMsg}
-							onChange={e => setpromptMsg(e.target.value)}
-							as="textarea"
-							rows={3}
-							placeholder="Enter your text here" />
+						<TemplateStringInput
+							code={promptMsg}
+							onChange={setpromptMsg}
+						></TemplateStringInput>
 					</Form.Group>
 				</Col>
 			</Row>
