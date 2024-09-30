@@ -1,5 +1,6 @@
 import { Button, Col, Form, Row } from "react-bootstrap";
 import RequiredInput from "./inputs/RequiredInput";
+import FileExtensionInput from "./inputs/FileExtensionInput";
 
 interface PromtRegisEntryInput {
 	type: 'string' | 'file' | 'files'
@@ -107,20 +108,13 @@ export default function PromptInputEditor({ value: input, onChange: setInput, va
 									</Form.Group>
 								</Col>
 								<Col xs={2}>
-									<Form.Group className="mb-3">
-										<Form.Label>File Types</Form.Label>
-										<Form.Control
-											value={value.file_types?.join(" ") || ""}
-											onChange={(e) =>
-												handleFieldChange(
-													name,
-													"file_types",
-													e.target.value.split(" ")
-												)
-											}
-											readOnly={readOnly}
-										/>
-									</Form.Group>
+									<FileExtensionInput
+										file_types={value.file_types || []}
+										readOnly={readOnly}
+										onChange={(file_types) =>
+											handleFieldChange(name, "file_types", file_types)
+										}
+									></FileExtensionInput>
 								</Col>
 							</>
 						)}
