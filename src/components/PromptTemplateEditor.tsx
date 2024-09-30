@@ -78,6 +78,7 @@ export default function PromptTemplateEditor({ template, varaint, llms, onTempla
 						<TemplateStringInput
 							code={systemMsg}
 							onChange={setsystemMsg}
+							readOnly={varaint === 'viewer'}
 						></TemplateStringInput>
 					</Form.Group>
 
@@ -86,6 +87,7 @@ export default function PromptTemplateEditor({ template, varaint, llms, onTempla
 						<TemplateStringInput
 							code={promptMsg}
 							onChange={setpromptMsg}
+							readOnly={varaint === 'viewer'}
 						></TemplateStringInput>
 					</Form.Group>
 				</Col>

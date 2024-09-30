@@ -33,10 +33,11 @@ Prism.languages.jinja2 = Prism.languages.extend('markup', {
 
 interface TemplateStringInputProps {
 	code: string;
+	readOnly?: boolean;
 	onChange: (newCode: string) => void;
 }
 
-export default function TemplateStringInput({ code, onChange }: TemplateStringInputProps) {
+export default function TemplateStringInput({ code, onChange, readOnly }: TemplateStringInputProps) {
 	const handleCodeChange = (newCode: string) => {
 		onChange(newCode);
 	};
@@ -48,6 +49,7 @@ export default function TemplateStringInput({ code, onChange }: TemplateStringIn
 				onValueChange={handleCodeChange}
 				highlight={code => Prism.highlight(code, Prism.languages.jinja2, 'jinja2')}
 				padding={10}
+				readOnly={readOnly}
 				style={{
 					fontFamily: '"Fira code", "Fira Mono", monospace',
 					fontSize: 14,

@@ -237,3 +237,11 @@ export function fetchDirectInfer(input: {
 		"output": "Holy geez"
 	})
 }
+
+export function fetchDeployableEnvs(model_id: string) {
+	return fetchMock(["alpha", "beta", "prod"])
+}
+
+export function fetchAddDeploy(model_id: string, env: string) {
+	return fetchMock({})
+}

@@ -1,11 +1,9 @@
-import { Button, Col, Container, Form, Row, Spinner, Table } from "react-bootstrap";
+import { Button, Col, Container, Form, Row, Spinner, Table, Toast } from "react-bootstrap";
 import EnvBadge from "../components/EnvBadge";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { fetchDeployments, fetchLLMs, fetchModel, PromptRegisFull } from "../utils/api";
+import { fetchAddDeploy, fetchDeployableEnvs, fetchDeployments, fetchLLMs, fetchModel, PromptRegisFull } from "../utils/api";
 import ErrorToast from "../components/ErrorToast";
-import PromptConfigEditor from "../components/PromptConfigEditor";
-import PromptInputEditor from "../components/PromptInputEditor";
 import PromptTemplateEditor from "../components/PromptTemplateEditor";
 
 export default function PromptManagement() {
@@ -14,25 +12,56 @@ export default function PromptManagement() {
 	const [error, setError] = useState<string | null>(null); // State for handling errors
 	const [template, settemplate] = useState<PromptRegisFull | undefined>(undefined)
 	const [llms, setllms] = useState<any[] | undefined>(undefined)
+	const navigate = useNavigate()
+	const [selectedDeployEnv, setselectedDeployEnv] = useState("")
+	const [deployableEnvs, setdeployableEnvs] = useState<string[] | undefined>(undefined)
+	const [deploying, setdeploying] = useState(false)
+	const [success, setSuccess] = useState(false); // State for handling success message
+
+	const obtainDeployments = () => {
+		if (id) {
+			fetchDeployments(id)
+				.then(setdeployments)
+				.catch(err => setError(err.message));
+			fetchDeployableEnvs(id)
+				.then(setdeployableEnvs)
+				.catch(err => setError(err.message));
+		}
+	}
+
+	const handleDeploy = () => {
+		console.log("deploying", selectedDeployEnv, id);
+		setdeploying(true);
+		setSuccess(false); // Reset success state
+		fetchAddDeploy(id!, selectedDeployEnv)
+			.then(() => {
+				setSuccess(true); // Show success message on successful deploy
+				// refetch deployments again
+				setdeployments(undefined);
+				setdeployableEnvs(undefined);
+				obtainDeployments();
+			})
+			.catch(err => setError(err.message))
+			.finally(() => setdeploying(false));
+	};
 
 	useEffect(() => {
 		if (id) {
 			// fetch other stuff
 			fetchModel(id)
 				.then((model) => {
-					settemplate(model)
+					settemplate(model);
 				})
-				.catch(err => setError(err.message))
-			fetchDeployments(id)
-				.then(setdeployments)
-				.catch(err => setError(err.message))
+				.catch(err => setError(err.message));
 			fetchLLMs()
 				.then(setllms)
-				.catch(err => setError(err.message))
+				.catch(err => setError(err.message));
+			obtainDeployments();
 		}
-	}, [id])
+	}, [id]);
+
 	return (
-		<Container>
+		<Container fluid>
 			<Row>
 				{(llms != null && template != null &&
 					<PromptTemplateEditor
@@ -43,9 +72,7 @@ export default function PromptManagement() {
 				}
 			</Row>
 			<Row>
-				{error &&
-					<ErrorToast error={error}></ErrorToast>
-				}
+				{error && <ErrorToast error={error}></ErrorToast>}
 			</Row>
 			<Row>
 				<h4>deployments</h4>
@@ -60,41 +87,49 @@ export default function PromptManagement() {
 					</thead>
 					<tbody>
 						{deployments != null && deployments.map(d => {
-							return <tr >
-								<td>
-									{d.deploy_name}
-								</td>
-								<td>
-									{d.deploy_version}
-								</td>
-								<td>
-									<EnvBadge env={d.deploy_env}></EnvBadge>
-								</td>
-								<td>
-									<Button>Playground</Button>
-								</td>
-							</tr>
+							return (
+								<tr key={d.deploy_name}>
+									<td>{d.deploy_name}</td>
+									<td>{d.deploy_version}</td>
+									<td><EnvBadge env={d.deploy_env}></EnvBadge></td>
+									<td><Button>Playground</Button></td>
+								</tr>
+							);
 						}) || <Spinner></Spinner>}
-
 					</tbody>
 				</Table>
 			</Row>
 			<Row>
 				<Col>
-					<Button>fork model</Button>
+					<Button onClick={() => navigate(`/create?ref=${id}`)}>fork model</Button>
 				</Col>
 				<Col>
-					<Form.Select>
-						<option>Select environment</option>
-						<option>alpha</option>
-						<option>beta</option>
-					</Form.Select>
+					{deployableEnvs != null &&
+						<Form.Select value={selectedDeployEnv} onChange={e => setselectedDeployEnv(e.target.value)}>
+							<option value={""}>Select environment</option>
+							{deployableEnvs.map(env => <option key={env} value={env}>{env}</option>)}
+						</Form.Select>
+						|| <Spinner></Spinner>
+					}
 				</Col>
 				<Col>
-					<Button>deploy</Button>
+					{deploying ? <Spinner></Spinner> : <Button onClick={handleDeploy}>deploy</Button>}
 				</Col>
 			</Row>
-		</Container>
-	)
-}
 
+			{/* Success Toast */}
+			<Toast
+				onClose={() => setSuccess(false)}
+				show={success}
+				delay={3000}
+				autohide
+				style={{ position: 'fixed', top: 20, right: 20 }}
+			>
+				<Toast.Header>
+					<strong className="mr-auto">Success</strong>
+				</Toast.Header>
+				<Toast.Body>Deployment successful!</Toast.Body>
+			</Toast>
+		</Container>
+	);
+}
